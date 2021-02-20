@@ -1,0 +1,63 @@
+## ----setup, include=FALSE--------------------------------------------------------------------------------------
+library(knitr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/rp303/OneDrive/Documents/coursera data science/ExploratoryData-AnalysisProject2")
+
+
+## --------------------------------------------------------------------------------------------------------------
+
+
+path <- getwd()
+filename<-"dataFiles.zip"
+
+if(!file.exists(filename)){
+    download.file(url = "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+              , destfile = paste(path, "dataFiles.zip", sep = "/"))
+    unzip(zipfile = "dataFiles.zip")
+}
+
+#load data into SCC (Source Classification Code) and NEI (SummarySCC_PM25) if we haven't already
+
+if(!exists("SCC")){
+  SCC <- data.table::as.data.table(x = readRDS(file = "Source_Classification_Code.rds"))
+}
+if(!exists("NEI")){
+  NEI <- data.table::as.data.table(x = readRDS(file = "summarySCC_PM25.rds"))
+}
+
+
+## --------------------------------------------------------------------------------------------------------------
+
+#limit data to only show Baltimore
+
+data2<-(NEI[NEI$fips == "24510",])
+
+#Subset data to only that related to combustion and coal
+
+combustion <- grepl(pattern = "combust",x = SCC$SCC.Level.One,ignore.case = TRUE)
+coal <- grepl(pattern = "coal",x = SCC$SCC.Level.Four,ignore.case = TRUE)
+combustioncoal <- (combustion & coal)
+combustionSCC <- SCC[combustioncoal,]$SCC
+combustionNEI <- NEI[NEI$SCC %in% combustionSCC,]
+
+
+#create plot 
+
+png("plot4.png")
+
+g <- ggplot(data = combustionNEI, aes(factor(year), Emissions/10^5)) +
+        geom_bar(stat = "identity",fill = "grey", width = 0.75) +
+        theme_grey(base_size = 14,base_family = "") +
+        labs(x="Year", y=expression("Total Emission ")) + 
+        labs(title=expression("Coal Combustion Source Emissions - US 1999-2008"))
+
+print(g)
+
+while (!is.null(dev.list()))  dev.off()
+
+## --------------------------------------------------------------------------------------------------------------
+#convert Rstudio rmd file to r file
+knitr::purl("plot4.Rmd")
+
+
