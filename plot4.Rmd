@@ -1,11 +1,19 @@
-## ----setup, include=FALSE----------------------------------------------------------------------------------------------
+---
+title: "Plot 4"
+author: "Rhay"
+date: "2/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
 library(knitr)
 library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/rp303/OneDrive/Documents/coursera data science/ExploratoryData-AnalysisProject2")
+```
+# Get the data
 
-
-## ----------------------------------------------------------------------------------------------------------------------
+```{r}
 
 
 path <- getwd()
@@ -25,9 +33,10 @@ if(!exists("SCC")){
 if(!exists("NEI")){
   NEI <- data.table::as.data.table(x = readRDS(file = "summarySCC_PM25.rds"))
 }
-
-
-## ----------------------------------------------------------------------------------------------------------------------
+```
+#Answer question 4:  
+#Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+```{r}
 
 #limit data to only show Baltimore
 
@@ -55,9 +64,11 @@ g <- ggplot(data = combustionNEI, aes(factor(year), Emissions/10^5)) +
 print(g)
 
 while (!is.null(dev.list()))  dev.off()
-
-## ----------------------------------------------------------------------------------------------------------------------
+```
+```{r}
 #convert Rstudio rmd file to r file
 knitr::purl("plot4.Rmd")
+
+```
 
 

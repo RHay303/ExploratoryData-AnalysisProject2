@@ -1,11 +1,19 @@
-## ----setup, include=FALSE----------------------------------------------------------------------------------------------
+---
+title: "Plot 5"
+author: "Rhay"
+date: "2/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
 library(knitr)
 library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/rp303/OneDrive/Documents/coursera data science/ExploratoryData-AnalysisProject2")
+```
+# Get the data
 
-
-## ----------------------------------------------------------------------------------------------------------------------
+```{r}
 
 
 path <- getwd()
@@ -25,36 +33,37 @@ if(!exists("SCC")){
 if(!exists("NEI")){
   NEI <- data.table::as.data.table(x = readRDS(file = "summarySCC_PM25.rds"))
 }
+```
+#Answer question 5:  
+#How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+```{r}
 
+#Subset data to only that related to search term of 'vehicle'
 
-## ----------------------------------------------------------------------------------------------------------------------
+condition <- grepl("vehicle", SCC[, SCC.Level.Two], ignore.case=TRUE)
+vehiclesSCC <- SCC[condition, SCC]
+vehiclesNEI <- NEI[NEI[, SCC] %in% vehiclesSCC,]
 
 #limit data to only show Baltimore
-
-data2<-(NEI[NEI$fips == "24510",])
-
-#Add type by year, sum
-
-data4<-aggregate(Emissions ~ year +type, data=data2, FUN=sum)
+data2<-vehiclesNEI[fips=="24510",]
 
 #create plot 
 
-#
-#
+png("plot5.png")
 
-png("plot3.png")
+g <- ggplot(data2,aes(factor(year),Emissions)) +
+  geom_bar(stat="identity") +
+  labs(x="year", y=expression("Total Emission (10^5 Tons)")) + 
+  labs(title=expression("PM"[2.5]*" Motor Vehicle Source Emissions in Baltimore from 1999-2008"))
 
-g <- ggplot(data4, aes(year, Emissions, color = type))
-g <- g + geom_line() +
-  xlab("year") +
-  ylab(expression("Total Emissions")) +
-  ggtitle('Total Emissions in Baltimore from 1999 to 2008')
 print(g)
 
 while (!is.null(dev.list()))  dev.off()
-
-## ----------------------------------------------------------------------------------------------------------------------
+```
+```{r}
 #convert Rstudio rmd file to r file
-knitr::purl("plot3.Rmd")
+knitr::purl("plot5.Rmd")
+
+```
 
 

@@ -1,11 +1,11 @@
-## ----setup, include=FALSE----------------------------------------------------------------------------------------------
+## ----setup, include=FALSE--------------------------------------------------------------------------------------
 library(knitr)
-library(ggplot2)
+library("data.table")
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/rp303/OneDrive/Documents/coursera data science/ExploratoryData-AnalysisProject2")
 
 
-## ----------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------
 
 
 path <- getwd()
@@ -27,34 +27,27 @@ if(!exists("NEI")){
 }
 
 
-## ----------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------
 
 #limit data to only show Baltimore
 
 data2<-(NEI[NEI$fips == "24510",])
 
-#Add type by year, sum
+#add up emissions for each year for Baltimore
 
-data4<-aggregate(Emissions ~ year +type, data=data2, FUN=sum)
+data3<-aggregate(Emissions~year,data = data2,FUN = sum)
 
 #create plot 
+png(filename="plot2.png")
+
+barplot(height=data3$Emissions, names.arg=data3$year, xlab="Year", ylab="Emissions by Ton", main="Total Emissions for Baltimore")
 
 #
-#
-
-png("plot3.png")
-
-g <- ggplot(data4, aes(year, Emissions, color = type))
-g <- g + geom_line() +
-  xlab("year") +
-  ylab(expression("Total Emissions")) +
-  ggtitle('Total Emissions in Baltimore from 1999 to 2008')
-print(g)
-
 while (!is.null(dev.list()))  dev.off()
 
-## ----------------------------------------------------------------------------------------------------------------------
+
+## --------------------------------------------------------------------------------------------------------------
 #convert Rstudio rmd file to r file
-knitr::purl("plot3.Rmd")
+knitr::purl("plot2.Rmd")
 
 
